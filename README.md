@@ -24,4 +24,4 @@ The initial list of cache_files should include all static assets.
 https://budget-tracker-mike-pizzica.herokuapp.com/
 
 ## Screenshot
-![Screenshot of budget tracker](./assets/screenshot-workout-tracker.png)
+![Screenshot of budget tracker](./assets/screenshot-budget-tracker.png)
