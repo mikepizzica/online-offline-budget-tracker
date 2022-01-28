@@ -8,6 +8,7 @@ request.onupgradeneeded = function (event) {
 
 request.onsuccess = function (event) {
     db = event.target.result
+      // Check if app is online before reading from db
     if (navigator.onLine) {
         checkDatabase();
     }
@@ -18,10 +19,14 @@ request.onerror = function (event) {
 };
 
 function checkDatabase() {
+    // Open a transaction on the db
     const transaction = db.transaction(['Pending'], 'readwrite');
+    // access Pending object
     const store = transaction.objectStore('Pending');
+    // Get all records from store and set to a variable
     const getAll = store.getAll();
     getAll.onsuccess = function () {
+        // If there are items in the store, we need to bulk add them when we are back online
         if (getAll.result.length > 0) {
             fetch('/api/transaction/bulk', {
                 method: 'POST',
@@ -33,8 +38,11 @@ function checkDatabase() {
             })
             .then((response) => response.json())
             .then((data) => {
+                // Open another transaction to BudgetStore with the ability to read and write
                 const transaction = db.transaction(['Pending'], 'readwrite');
+                // Assign the store to a variable
                 const store = transaction.objectStore('Pending');
+                // Clear existing entries because our bulk add was successful
                 store.clear();
             })
         }
@@ -47,4 +55,5 @@ const saveRecord = (record) => {
     store.add(record);
 }
 
+// Listen for app coming back online
 window.addEventListener('online', checkDatabase);
